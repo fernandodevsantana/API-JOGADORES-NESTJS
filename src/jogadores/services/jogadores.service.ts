@@ -19,36 +19,60 @@ export class JogadoresService {
         if(jogadorExiste){
             throw new AppError("O email informado ja esta em uso");
         }
+        try {
+            const criarJogador = await this.criar(criarJogadorDto)
+            return criarJogador
+        } catch (error) {
+            throw new AppError(`Erro ao criar jogador ${error}`,400)
+        }
 
-         const criarJogador = await this.criar(criarJogadorDto)
-         return criarJogador
     }
 
     private async criar(criarJogadorDto:CriarJogadorDto): Promise<IJogador>{
         const jogadorCriado = new this.jogadorModule(criarJogadorDto)
-        const jogadorSalvado = await jogadorCriado.save()
-        return jogadorSalvado;
+        try {
+            const jogadorSalvado = await jogadorCriado.save()
+            return jogadorSalvado;
+        } catch (error) {
+            throw new AppError(`Erro ao salvar jogador ${error}`,400)
+        }
+
     }
 
     public async findAll():Promise<IJogador[]>{
-        const jogadores = await this.jogadorModule.find();
-        if (!jogadores) {
-            throw new AppError("Nenhum jogador cadastrado")
+        try {
+            const jogadores = await this.jogadorModule.find();
+            if (!jogadores) {
+                throw new AppError("Nenhum jogador cadastrado")
+            }
+            return jogadores;
+        } catch (error) {
+            throw new AppError(`Erro ao procurar jogadores ${error}`,400)
         }
-        return jogadores;
+
     }
 
     public async findByEmail(email:string):Promise<IJogador>{
-        const jogador = await this.jogadorModule.findOne({email:email})
-        if (!jogador) {
-            throw new AppError("Nenhum jogador encontrado com o email informado")
+        try {
+            const jogador = await this.jogadorModule.findOne({email:email})
+            if (!jogador) {
+                throw new AppError("Nenhum jogador encontrado com o email informado")
+            }
+            return jogador;
+        } catch (error) {
+            throw new AppError(`Erro ao procurar jogador ${error}`,400)
         }
-        return jogador;
+
     }
 
     public async delete(id:string):Promise<void>{
-        const jogador = await this.jogadorModule.findById(id)
-        await this.jogadorModule.remove(jogador)
-        return
+        try {
+            const jogador = await this.jogadorModule.findById(id)
+            await this.jogadorModule.remove(jogador)
+            return
+        } catch (error) {
+            throw new AppError(`Erro ao remover jogador ${error}`,400)
+        }
+
     }
 }
