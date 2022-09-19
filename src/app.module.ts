@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { JogadoresModule } from './jogadores/jogadores.module';
+import { JogadoresModule } from './modules/jogadores/jogadores.module';
 import {config} from 'dotenv'
 config()
 

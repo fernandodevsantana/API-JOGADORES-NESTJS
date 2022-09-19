@@ -28,6 +28,27 @@ export class JogadoresService {
         const jogadorCriado = new this.jogadorModule(criarJogadorDto)
         const jogadorSalvado = await jogadorCriado.save()
         return jogadorSalvado;
+    }
 
+    public async findAll():Promise<IJogador[]>{
+        const jogadores = await this.jogadorModule.find();
+        if (!jogadores) {
+            throw new AppError("Nenhum jogador cadastrado")
+        }
+        return jogadores;
+    }
+
+    public async findByEmail(email:string):Promise<IJogador>{
+        const jogador = await this.jogadorModule.findOne({email:email})
+        if (!jogador) {
+            throw new AppError("Nenhum jogador encontrado com o email informado")
+        }
+        return jogador;
+    }
+
+    public async delete(id:string):Promise<void>{
+        const jogador = await this.jogadorModule.findById(id)
+        await this.jogadorModule.remove(jogador)
+        return
     }
 }

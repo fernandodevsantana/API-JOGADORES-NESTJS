@@ -14,20 +14,19 @@ export class JogadoresController {
         return service
     }
 
-    // @Get()
-    // async list(){
-    //     const service = await this.jogadorService.findAll()
-    //     return service
-    // }
+    @Get()
+    async list(){
+        const service = await this.jogadorService.findAll()
+        return service
+    }
 
-    // @Get()
-        
-    //     async findOne(@Query('email') email:string):Promise<IJogador>{
-    //         return this.jogadorService.findByEmail(email)
-    // }
+    @Get()
+        async findOne(@Query('email') email:string):Promise<IJogador>{
+            return this.jogadorService.findByEmail(email)
+    }
 
-    // @Delete()
-    // async remove(@Query('email') email:string):Promise<void>{
-    //     return this.jogadorService.remove(email)
-    // }
+    @Delete()
+    async remove(@Query('id') id:string):Promise<void>{
+        return this.jogadorService.delete(id)
+    }
 }
