@@ -76,12 +76,15 @@ export class JogadoresService {
     }
 
     public async delete(id:string):Promise<void>{
-        try {
-            const jogador = await this.jogadorModule.findById(id)
-            await this.jogadorModule.remove(jogador)
-            return
+        try {            
+                const jogador = await this.jogadorModule.findById(id)
+                if (!jogador) {
+                    throw new AppError("Nenhum jogador encontrado",401)
+                }
+                await this.jogadorModule.deleteOne({_id:jogador.id})
+                return
         } catch (error) {
-            throw new AppError(`Erro ao remover jogador ${error}`,400)
+           throw new AppError("Erro ao remover usuario",500)
         }
 
     }
