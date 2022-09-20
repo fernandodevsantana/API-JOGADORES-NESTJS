@@ -36,7 +36,16 @@ export class JogadoresService {
         } catch (error) {
             throw new AppError(`Erro ao salvar jogador ${error}`,400)
         }
+    }
 
+    public async update(id:string,criarJogadorDto:CriarJogadorDto): Promise<IJogador>{
+        const jogador = await this.jogadorModule.findById(id)        
+        if (!jogador) {
+            throw new AppError("Jogador náo encontrado",404)
+        }
+
+        const jogadorAtualizado = await this.jogadorModule.findOneAndUpdate({email:jogador.email},{$set:criarJogadorDto}).exec()        
+        return jogadorAtualizado
     }
 
     public async findAll():Promise<IJogador[]>{
@@ -46,8 +55,8 @@ export class JogadoresService {
                 throw new AppError("Nenhum jogador cadastrado")
             }
             return jogadores;
-        } catch (error) {
-            throw new AppError(`Erro ao procurar jogadores ${error}`,400)
+        } catch (error) {            
+            throw new AppError(`Erro ao procurar jogadores ${error.message}`,400)
         }
 
     }
@@ -60,6 +69,7 @@ export class JogadoresService {
             }
             return jogador;
         } catch (error) {
+            console.log(error);
             throw new AppError(`Erro ao procurar jogador ${error}`,400)
         }
 
