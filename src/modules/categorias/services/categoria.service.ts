@@ -1,6 +1,8 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { BadRequestException, Injectable, Logger } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
+import { IJogador } from "src/modules/jogadores/interface/jogador.interface";
+import { JogadoresService } from "src/modules/jogadores/services/jogadores.service";
 import AppError from "src/shared/error/AppError";
 import { CriarCategoriaDto } from "../dtos/criar-categoria.dto";
 import { ICategoria } from "../interface/categoria.interface";
@@ -9,10 +11,13 @@ import { ICategoria } from "../interface/categoria.interface";
 export class CategoriaService{
     constructor(
         @InjectModel('categoria')
-        private readonly categorieModule: Model<ICategoria>){}
+        private readonly categorieModule: Model<ICategoria>,
+        private readonly jogadoresService: JogadoresService
+        ){}
+  
         private readonly logger = new Logger(CategoriaService.name);
 
-    public async createcategorie(createCategory:CriarCategoriaDto):Promise<ICategoria>{
+    public async createcategorie(createCategory:CriarCategoriaDto):Promise<ICategoria>{        
         const categorie = await this.categorieModule.findOne({categoria:createCategory.categoria}).exec()
         if (categorie) {
             throw new AppError('Categoria ja cadastrada no sistema')
@@ -30,9 +35,9 @@ export class CategoriaService{
     }
 
     public async updateCategorie(id:string, updatedCategorie:CriarCategoriaDto):Promise<ICategoria>{
-        const searchCategorie = await this.categorieModule.findOne({categoria:updatedCategorie.categoria}).exec()
+        const searchCategorie = await this.categorieModule.findOne({_id:id}).exec()
         if(!searchCategorie){
-            throw new AppError('Nenhuma categoria com o nome informado encontrada',401);
+            throw new AppError('Nenhuma categoria com o id informado encontrada',401);
         }
 
         const categorieUpdated = await this.categorieModule.findOneAndUpdate({categoria:updatedCategorie.categoria},{$set:updatedCategorie}).exec()
@@ -52,5 +57,25 @@ export class CategoriaService{
 
     async findAllById(id:string):Promise<ICategoria>{
         return this.categorieModule.findById(id)
+    }
+
+    async searchJogadorById(id:string):Promise<IJogador>{
+        const jogador = await this.jogadoresService.findById(id)
+        return jogador
+    }
+
+    async vinculateCategorieAtJogador(idJogador:string, idCategorie:string):Promise<ICategoria>{        
+        try {      
+            const jogador = await this.searchJogadorById(idJogador)            
+            const categorie = await this.categorieModule.findById({_id:idCategorie}).exec()
+            const jogadorInCategorie = await this.categorieModule.find({idCategorie}).where('jogadores').in([idJogador]).exec()
+            if (jogadorInCategorie.length === 0) {      
+                categorie.jogadores.push(jogador)
+                return  await this.categorieModule.findOneAndUpdate({_id:categorie.id},{$set:categorie}).exec()
+            }
+            throw new BadRequestException('Jogador ja vinculado a categoria selecionada')
+        } catch (error) {
+            throw new BadRequestException(`Erro ao vincular jogador a categoria: ${error.message}`)        
+        }
     }
 }

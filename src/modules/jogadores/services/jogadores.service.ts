@@ -34,6 +34,8 @@ export class JogadoresService {
             const jogadorSalvado = await jogadorCriado.save()
             return jogadorSalvado;
         } catch (error) {
+            console.log(error);
+            
             throw new AppError(`Erro ao salvar jogador ${error}`,400)
         }
     }
@@ -72,7 +74,19 @@ export class JogadoresService {
             console.log(error);
             throw new AppError(`Erro ao procurar jogador ${error}`,400)
         }
+    }
 
+    public async findById(id:string):Promise<IJogador>{
+        try {
+            const jogador = await this.jogadorModule.findById({_id:id})
+            if (!jogador) {
+                throw new AppError("Nenhum jogador encontrado com o id informado")
+            }
+            return jogador;
+        } catch (error) {
+            console.log(error);
+            throw new AppError(`Erro ao procurar jogador ${error}`,400)
+        }
     }
 
     public async delete(id:string):Promise<void>{
@@ -86,6 +100,7 @@ export class JogadoresService {
         } catch (error) {
            throw new AppError("Erro ao remover usuario",500)
         }
-
     }
+
+    
 }
