@@ -4,11 +4,11 @@ import { IJogador } from "src/modules/jogadores/interface/jogador.interface";
 export interface ICategoria extends Document{
     readonly categoria:string;
     descricao: string;
-    eventos:Array<Event>;
+    eventos:Array<Evento>;
     jogadores:Array<IJogador>
 }
 
-export interface Event{
+export interface Evento{
     nome:string;
     operacao:string;
     valor:number;

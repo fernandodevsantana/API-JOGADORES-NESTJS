@@ -10,6 +10,6 @@ export const categoriaSchema = new mongoose.Schema({
     }],
     jogadores:[{
         type:mongoose.Schema.Types.ObjectId,
-        ref:"jogador"
+        ref:"jogadores"
     }]
 },{timestamps:true,collection:'categoria'})
